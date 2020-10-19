@@ -1,3 +1,5 @@
+const https = require('https')
+
 module.exports = (request, response, stdout) => {
   const path = request.url.split('/');
   const delay = path[1];
@@ -22,7 +24,19 @@ module.exports = (request, response, stdout) => {
     response.setHeader('Access-Control-Allow-Headers', request.headers['access-control-request-headers'] || '');
     response.setHeader('Access-Control-Allow-Methods', request.headers['access-control-request-methods'] || '');
     response.end();
-  } else {
+  } else if (request.method === 'HEAD'){
+
+    const req = https.request(redirectUrl, {"method": "HEAD"}, (res) => {
+      response_headers = res.headers;
+      for (const key in response_headers) {
+        response.setHeader(key, response_headers[key]);
+      }
+      response.end();
+    });
+
+    req.end();
+  } 
+  else {
     response.statusCode = 404;
     response.end();
   }
