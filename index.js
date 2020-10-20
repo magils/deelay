@@ -24,7 +24,7 @@ module.exports = (request, response, stdout) => {
 
           //Hack: Throttle doesn't restore the Network Interface speed when stops, setting high connection speed to not slowdown the server bandwidth
           //Using "fois" profile values. see :  https://github.com/sitespeedio/throttle 
-          throttle.start({up: 5000, down: 20000, rtt: 2}).then(() => {}).then(() => {throttle.stop()});
+          throttle.start({up: 5000, down: 20000, rtt: 2}).then(() => {throttle.stop()});
         });
       });
     });
