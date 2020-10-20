@@ -11,6 +11,7 @@ module.exports = (request, response, stdout) => {
   if (request.method === 'GET' && path.length > 2 && path[2] === "slow-connection") {
 
     redirectUrl = path.slice(3).join('/');
+    console.log("URL: ", redirectUrl);
 
     throttle.start({up: 100, down: 100, rtt: 200}).then(() =>{
 
