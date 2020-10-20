@@ -10,20 +10,29 @@ module.exports = (request, response, stdout) => {
 
   redirectUrl = redirectUrl = path.slice(3).join('/');
 
-  const throttle_conn = async function (){
-    const options = {up: 360, down: 25, rtt: 300};
-    await throttle.start(options);
+  // const throttle_conn = async function (){
+  //   const options = {up: 360, down: 25, rtt: 300};
+  //   await throttle.start(options);
 
+  //   const req = https.get(redirectUrl, (res) => {
+  //     res.on('data', (chunk) => { response.write(chunk) });
+  //    });
+
+  //    response.end();
+
+  //   await throttle.stop();
+  //  }
+
+  //  throttle_conn();
+
+  throttle.start({up: 100, down: 100, rtt: 200}).then(() =>{
     const req = https.get(redirectUrl, (res) => {
       res.on('data', (chunk) => { response.write(chunk) });
      });
 
      response.end();
+  });
 
-    await throttle.stop();
-   }
-
-   throttle_conn();
 
  }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
