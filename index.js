@@ -5,6 +5,8 @@ module.exports = (request, response, stdout) => {
   const path = request.url.split('/');
   const delay = path[1];
   let redirectUrl = path.slice(2).join('/');
+  var dataArray = [];
+
 
   if (request.method === 'GET' && path.length > 2 && path[2] === "slow-connection") {
 
@@ -26,14 +28,15 @@ module.exports = (request, response, stdout) => {
   //  throttle_conn();
 
   throttle.start({up: 100, down: 100, rtt: 200}).then(() =>{
+
     const req = https.get(redirectUrl, (res) => {
-      res.on('data', (chunk) => { response.write(chunk) });
+      res.on('data', (chunk) => { dataArray.push(chunk) });
+      res.on('end', () => {
+         var buffer = Buffer.concat(dataArray);
+      });
      });
-
-     response.end();
+     response.end(buffer);
   });
-
-
  }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
       redirectUrl = `https://${redirectUrl}`;
