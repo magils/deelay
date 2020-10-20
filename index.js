@@ -13,7 +13,7 @@ module.exports = (request, response, stdout) => {
     redirectUrl = path.slice(3).join('/');
     console.log("URL: ", redirectUrl);
 
-    throttle.start({up: 100, down: 100, rtt: 200}).then(() =>{
+    throttle.start({up: 100, down: 100, rtt: 300}).then(() =>{
 
       const req = https.get(redirectUrl, (res) => {
         res.on('data', (chunk) => { dataArray.push(chunk) });
