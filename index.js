@@ -1,11 +1,31 @@
 const https = require('https')
+const throttle = require('@sitespeed.io/throttle')
 
 module.exports = (request, response, stdout) => {
   const path = request.url.split('/');
   const delay = path[1];
   let redirectUrl = path.slice(2).join('/');
 
-  if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
+  if (request.method === 'GET' && path.length > 2 && path[2] === "slow-connection") {
+
+  redirectUrl = redirectUrl = path.slice(3).join('/');
+
+  const throttle_conn = async function (){
+    const options = {up: 360, down: 25, rtt: 300};
+    await throttle.start(options);
+
+    const req = https.get(redirectUrl, (res) => {
+      res.on('data', (chunk) => { response.write(chunk) });
+     });
+
+     response.end();
+
+    await throttle.stop();
+   }
+
+   throttle_conn();
+
+ }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
       redirectUrl = `https://${redirectUrl}`;
     }
@@ -26,7 +46,7 @@ module.exports = (request, response, stdout) => {
     response.end();
   } else if (request.method === 'HEAD'){
 
-    const req = https.request(redirectUrl, {"method": "HEAD"}, (res) => {
+      const req = https.request(redirectUrl, {"method": "HEAD"}, (res) => {
       response_headers = res.headers;
       for (const key in response_headers) {
         response.setHeader(key, response_headers[key]);
@@ -35,7 +55,7 @@ module.exports = (request, response, stdout) => {
     });
 
     req.end();
-  } 
+  }
   else {
     response.statusCode = 404;
     response.end();
