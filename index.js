@@ -22,11 +22,11 @@ module.exports = (request, response, stdout) => {
           response.end(buffer);
         });
       });
-    }).then(() => {throttle.stop()});
-
-    //Hack: Throttle doesn't restore the Network Interface speed when stops, setting high connection speed to not slow down the server
-    //Using "fois" profile values. See: https://github.com/sitespeedio/throttle#pre-made-profiles
-    throttle.start({up: 5000, down: 20000, rtt: 2}).then(() => {}).then(() => {throttle.stop()});
+    }).then(() => {throttle.stop()}).then( () => {
+      //Hack: Throttle doesn't restore the Network Interface speed when stops, setting high connection speed to not slow down the server
+      //Using "fois" profile values. See: https://github.com/sitespeedio/throttle#pre-made-profiles
+      throttle.start({up: 5000, down: 20000, rtt: 2}).then(() => {}).then(() => {throttle.stop()});
+    });
 
  }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
