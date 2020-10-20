@@ -33,9 +33,9 @@ module.exports = (request, response, stdout) => {
       res.on('data', (chunk) => { dataArray.push(chunk) });
       res.on('end', () => {
          var buffer = Buffer.concat(dataArray);
+         response.end(buffer);
       });
      });
-     response.end(buffer);
   });
  }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
