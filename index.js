@@ -10,7 +10,7 @@ module.exports = (request, response, stdout) => {
 
   if (request.method === 'GET' && path.length > 2 && path[2] === "slow-connection") {
 
-  redirectUrl = redirectUrl = path.slice(3).join('/');
+  redirectUrl = path.slice(3).join('/');
 
   // const throttle_conn = async function (){
   //   const options = {up: 360, down: 25, rtt: 300};
@@ -57,6 +57,10 @@ module.exports = (request, response, stdout) => {
     response.setHeader('Access-Control-Allow-Methods', request.headers['access-control-request-methods'] || '');
     response.end();
   } else if (request.method === 'HEAD'){
+
+    if(path[2] === "slow-connection") {
+      redirectUrl = path.slice(3).join('/');
+    }
 
       const req = https.request(redirectUrl, {"method": "HEAD"}, (res) => {
       response_headers = res.headers;
