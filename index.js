@@ -22,9 +22,8 @@ module.exports = (request, response, stdout) => {
           response.end(buffer);
         });
       });
-    });
+    }).then(() => {throttle.stop()});
 
-    throttle.stop();
  }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
       redirectUrl = `https://${redirectUrl}`;
