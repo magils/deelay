@@ -10,33 +10,18 @@ module.exports = (request, response, stdout) => {
 
   if (request.method === 'GET' && path.length > 2 && path[2] === "slow-connection") {
 
-  redirectUrl = path.slice(3).join('/');
+    redirectUrl = path.slice(3).join('/');
 
-  // const throttle_conn = async function (){
-  //   const options = {up: 360, down: 25, rtt: 300};
-  //   await throttle.start(options);
+    throttle.start({up: 100, down: 100, rtt: 200}).then(() =>{
 
-  //   const req = https.get(redirectUrl, (res) => {
-  //     res.on('data', (chunk) => { response.write(chunk) });
-  //    });
-
-  //    response.end();
-
-  //   await throttle.stop();
-  //  }
-
-  //  throttle_conn();
-
-  throttle.start({up: 100, down: 100, rtt: 200}).then(() =>{
-
-    const req = https.get(redirectUrl, (res) => {
-      res.on('data', (chunk) => { dataArray.push(chunk) });
-      res.on('end', () => {
-         var buffer = Buffer.concat(dataArray);
-         response.end(buffer);
+      const req = https.get(redirectUrl, (res) => {
+        res.on('data', (chunk) => { dataArray.push(chunk) });
+        res.on('end', () => {
+          var buffer = Buffer.concat(dataArray);
+          response.end(buffer);
+        });
       });
-     });
-  });
+    });
  }  else if (request.method === 'GET' && !isNaN(delay) && path.length > 2) {
     if (!redirectUrl.match(/^(http|https):/)) {
       redirectUrl = `https://${redirectUrl}`;
