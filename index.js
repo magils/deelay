@@ -8,12 +8,12 @@ module.exports = (request, response, stdout) => {
       const path = request.url.split('/');
       var dataArray = [];
 
-      if (request.method === 'GET' && path.length > 2 && path[2] === "slow-connection") {
+      if (request.method === 'GET' && path.length > 2 && path[1] === "slow-connection") {
 
-        redirectUrl = path.slice(3).join('/');
+        redirectUrl = path.slice(2).join('/');
         console.log("Slow connection...");
 
-        throttle.start({up: 100, down: 100, rtt: 300}).then(() =>{
+        throttle.start({up: 100, down: 100, rtt: 100}).then(() =>{
 
           const req = https.get(redirectUrl, (res) => {
             res.on('data', (chunk) => { dataArray.push(chunk) });
@@ -33,7 +33,8 @@ module.exports = (request, response, stdout) => {
 
         if (isNaN(delay)){
           response.statusCode = 400;
-          response.end({"error": "Invalid timeout value"});
+          response.end(JSON.stringify({"error": "Invalid timeout value"}));
+          return;
         }
 
         if (!redirectUrl.match(/^(http|https):/)) {
@@ -69,9 +70,9 @@ module.exports = (request, response, stdout) => {
         });
 
         req.end();
-    } else if (request.method == "POST" && path.length > 2 &&  path[2] == "/bandwidth/restore") {
+    } else if (request.method == "POST" && path[1] == "restore") {
         throttle.start({up: 5000, down: 20000, rtt: 2}).then(() => {throttle.stop()});
-        response.statusCode = 201;
+        response.statusCode = 202;
         response.end()
     } else {
       response.statusCode = 404;
